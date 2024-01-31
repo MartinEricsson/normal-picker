@@ -1,0 +1,11 @@
+{
+  "name": "normal-picker-ce",
+  "version": "1.0.0",
+  "description": "A custom element for picking a normal as color",
+  "main": "index.js",
+  "scripts": {
+    "start": "node serve.js"
+  },
+  "author": "ME",
+  "license": "none"
+}
