@@ -16,18 +16,65 @@
         justify-content: center;
         align-items: center;
       }
+      @media (max-width: 768px) {
+        body {
+          flex-direction: column;
+        }
+      }
     </style>
   </head>
   <body>
     <script src="src/index.js" type="module"></script>
     <normal-picker></normal-picker>
+    <canvas id="surface" width="320" height="240"></canvas>
 
     <script type="module">
+      let color = "rgb(128, 128, 255)";
+      let isDrawing = false;
+
       document
         .querySelector("normal-picker")
         .addEventListener("colorChange", (event) => {
           console.log("Selected color:", event.detail.color);
+          const r = event.detail.color.r;
+          const g = event.detail.color.g;
+          const b = event.detail.color.b;
+          color = `rgb(${r},${g},${b})`;
         });
+
+      // example drawing surface
+      const canvas = document.getElementById("surface");
+      const ctx = canvas.getContext("2d");
+
+      // clear
+      ctx.fillStyle = "rgb(128, 128, 255)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      function drawWithBrush(ctx, x, y, scale) {
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(x, y, 10 * scale, 0, 2 * Math.PI, false);
+        ctx.fill();
+      }
+
+      // listerners for drawing
+      canvas.addEventListener("pointerdown", (ev) => {
+        const { offsetX: x, offsetY: y } = ev;
+        drawWithBrush(ctx, x, y, event.pressure);
+
+        isDrawing = true;
+      });
+
+      canvas.addEventListener("pointermove", (ev) => {
+        if (isDrawing === true) {
+          const { offsetX: x, offsetY: y } = ev;
+          drawWithBrush(ctx, x, y, event.pressure);
+        }
+      });
+
+      window.addEventListener("pointerup", (ev) => {
+        isDrawing = false;
+      });
     </script>
   </body>
 </html>

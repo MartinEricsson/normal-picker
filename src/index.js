@@ -1,13 +1,20 @@
 const style = `
     .color-picker {
         width: 150px;
-        height: 16px;
+        height: 18px;
         background-color: #000000;
         border-color: rgba(0,0,0,0.5);
         border-width: 1px;
         border-style: solid;
         border-radius: 2px;
         margin: 10px;
+    }
+    .color-picker .color-code {
+        font-size: 0.8rem;
+        color: white;
+        margin: 0 4px;
+        line-height: 18px;
+        text-transform: uppercase;
     }
     .container {
         font-family: sans-serif;
@@ -26,17 +33,11 @@ const style = `
         margin: 0px 10px;
     }
     .viz-div {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
+       font-size: 0.8rem;
     }
     #theta-range, #phi-range{
         width: 150px;
         margin: 10px;
-    }
-
-    label {
-        font-size: 0.8rem;
     }
 
     /*********** Baseline, reset styles ***********/
@@ -113,25 +114,34 @@ class NormalPicker extends HTMLElement {
             <style>${style}</style>
             <div class="container">
                 <canvas id="screen" width="150" height="150"></canvas>
+                <div class="viz-div"></div>
                 <div class="color-picker"></div>
-                <label for="theta-range">Theta:</label>
                 <input type="range" id="theta-range" min="0" max="360" value="0" class="theta-range">
-                <label for="phi-range">Phi:</label>
                 <input type="range" id="phi-range" min="0" max="360" value="180" class="phi-range">
             </div>
         `;
 
         this.shadowRoot.querySelector('.theta-range').addEventListener('input', ({ target }) => {
             this.update();
-            this.shadowRoot.querySelector('label[for="theta-range"]').textContent = `Theta: ${target.value}`;
+
+            const t = `Θ: ${this.shadowRoot.querySelector('.theta-range').value}°`;
+            const p = `Φ: ${this.shadowRoot.querySelector('.phi-range').value}°`;
+
+            this.shadowRoot.querySelector('.viz-div').textContent = `(${t} ${p})`;
         });
         this.shadowRoot.querySelector('.phi-range').addEventListener('input', ({ target }) => {
             this.update();
-            this.shadowRoot.querySelector('label[for="phi-range"]').textContent = `Phi: ${target.value}`;
+
+            const t = `Θ: ${this.shadowRoot.querySelector('.theta-range').value}°`;
+            const p = `Φ: ${this.shadowRoot.querySelector('.phi-range').value}°`;
+
+            this.shadowRoot.querySelector('.viz-div').textContent = `(${t} ${p})`;
         });
 
-        this.shadowRoot.querySelector('label[for="theta-range"]').textContent = `Theta: ${this.shadowRoot.querySelector('.theta-range').value}`;
-        this.shadowRoot.querySelector('label[for="phi-range"]').textContent = `Phi: ${this.shadowRoot.querySelector('.phi-range').value}`;
+        const t = `Θ: ${this.shadowRoot.querySelector('.theta-range').value}°`;
+        const p = `Φ: ${this.shadowRoot.querySelector('.phi-range').value}°`;
+
+        this.shadowRoot.querySelector('.viz-div').textContent = `(${t} ${p})`;
 
         this.ctx = this.shadowRoot.getElementById('screen').getContext('2d');
         this.update();
@@ -141,6 +151,7 @@ class NormalPicker extends HTMLElement {
         const color = this.getColorFromNormal();
         this.shadowRoot.querySelector('.color-picker').style.backgroundColor = `rgb(${color.r}, ${color.g}, ${color.b})`;
         this.setAttribute('value', `#${color.r.toString(16)}${color.g.toString(16)}${color.b.toString(16)}`);
+        this.shadowRoot.querySelector('.color-picker').innerHTML = `<div class="color-code">${this.getAttribute('value')}</div>`;
 
         const customEvent = new CustomEvent('colorChange', {
             detail: { color: color }
